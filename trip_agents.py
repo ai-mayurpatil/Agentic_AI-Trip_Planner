@@ -44,3 +44,66 @@ class TripAgents:
             llm=self.llm,
             verbose=True
         )
+
+class TripTasks:
+    def __init__(self):
+        pass
+    
+    def city_selection_task(self, agent, inputs):
+        return Task(
+            name="city_selection",  # Set task name for later extraction
+            description=(
+                f"Analyze user preferences and select best destinations:\n"
+                f"- Travel Type: {inputs['travel_type']}\n"
+                f"- Interests: {inputs['interests']}\n"
+                f"- Season: {inputs['season']}\n"
+                "Output: Provide 3 city options with a brief rationale for each."
+            ),
+            agent=agent,
+            expected_output="Bullet-point list of 3 cities with 2-sentence explanations each."
+        )
+    
+    def city_research_task(self, agent, city):
+        return Task(
+            name="city_research",  # Set task name
+            description=(
+                f"Provide detailed insights about {city} including:\n"
+                "- Top 5 attractions\n"
+                "- Local cuisine highlights\n"
+                "- Cultural norms/etiquette\n"
+                "- Recommended accommodation areas\n"
+                "- Transportation tips"
+            ),
+            agent=agent,
+            expected_output="Organized sections with clear headings and bullet points."
+        )
+    
+    def itinerary_creation_task(self, agent, inputs, city):
+        return Task(
+            name="itinerary",  # Set task name
+            description=(
+                f"Create a {inputs['duration']}-day itinerary for {city} including:\n"
+                "- Daily schedule with time allocations\n"
+                "- Activity sequencing\n"
+                "- Transportation between locations\n"
+                "- Meal planning suggestions"
+            ),
+            agent=agent,
+            expected_output="Day-by-day table format with time slots and activity details."
+        )
+    
+    def budget_planning_task(self, agent, inputs, itinerary):
+        return Task(
+            name="budget",  # Set task name
+            description=(
+                f"Create a budget plan for the selected budget range ({inputs['budget']}) covering:\n"
+                "- Accommodation costs\n"
+                "- Transportation expenses\n"
+                "- Activity fees\n"
+                "- Meal budget\n"
+                "- Emergency funds allocation"
+            ),
+            agent=agent,
+            context=[itinerary],
+            expected_output="Itemized budget table with total cost analysis."
+        )
