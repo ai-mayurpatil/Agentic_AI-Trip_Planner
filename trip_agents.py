@@ -156,4 +156,3 @@ class TripCrew:
                 print(f"Task {idx} raw output:", task)
         
         return final_result
-
