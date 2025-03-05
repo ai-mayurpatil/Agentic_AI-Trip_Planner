@@ -24,3 +24,12 @@ pip install -r requirements.txt
 ```bash
 python app.py
 ```
+### Set Api Key
+```bash
+export GEMINI_API_KEY="your-gemini-api-key-here"
+```
+
+### Check Api Key
+```bash
+echo $GEMINI_API_KEY
+```
