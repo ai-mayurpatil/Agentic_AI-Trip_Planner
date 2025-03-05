@@ -107,3 +107,53 @@ class TripTasks:
             context=[itinerary],
             expected_output="Itemized budget table with total cost analysis."
         )
+
+class TripCrew:
+    def __init__(self, inputs):
+        self.inputs = inputs
+        
+    def run(self):
+        agents = TripAgents()
+        tasks = TripTasks()
+        
+        # Create Agents
+        city_selector = agents.city_selector_agent()
+        local_expert = agents.local_expert_agent()
+        travel_planner = agents.travel_planner_agent()
+        budget_manager = agents.budget_manager_agent()
+        
+        # Create Tasks with explicit names
+        select_cities = tasks.city_selection_task(city_selector, self.inputs)
+        research_city = tasks.city_research_task(local_expert, "Paris")  # Example: using "Paris" as the city; adjust as needed.
+        create_itinerary = tasks.itinerary_creation_task(travel_planner, self.inputs, "Paris")
+        plan_budget = tasks.budget_planning_task(budget_manager, self.inputs, create_itinerary)
+        
+        # Assemble Crew and run all tasks
+        crew = Crew(
+            agents=[city_selector, local_expert, travel_planner, budget_manager],
+            tasks=[select_cities, research_city, create_itinerary, plan_budget],
+            verbose=True
+        )
+        
+        result = crew.kickoff()
+        
+        # Use the tasks_output attribute (a list of TaskOutput objects) to build a dictionary.
+        if hasattr(result, "tasks_output"):
+            tasks_list = result.tasks_output
+            final_result = {
+                "city_selection": tasks_list[0].raw if len(tasks_list) > 0 else "❌ No city selection found.",
+                "city_research": tasks_list[1].raw if len(tasks_list) > 1 else "❌ No city research found.",
+                "itinerary": tasks_list[2].raw if len(tasks_list) > 2 else "❌ No itinerary generated.",
+                "budget": tasks_list[3].raw if len(tasks_list) > 3 else "❌ No budget breakdown available."
+            }
+        else:
+            final_result = {}
+        
+        # Log detailed raw outputs to the console (for debugging)
+        print("Crew kickoff raw result:", result)
+        if hasattr(result, "tasks_output"):
+            for idx, task in enumerate(result.tasks_output):
+                print(f"Task {idx} raw output:", task)
+        
+        return final_result
+
